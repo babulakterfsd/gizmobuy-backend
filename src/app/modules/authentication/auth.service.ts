@@ -188,7 +188,7 @@ const changePasswordInDB = async (
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'Password change is not allowed for this demo account',
+      'Password change is not allowed for this demo account !',
     );
   }
 
