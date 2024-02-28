@@ -43,7 +43,7 @@
 ### live link
 
 - client: https://gizmobuy.vercel.app
-- server:
+- server: https://gizmobuy-backend.vercel.app
 
 ### DEMO LOGIN DETAILS
 
