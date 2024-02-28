@@ -42,7 +42,7 @@
 
 ### live link
 
-- client:
+- client: https://gizmobuy.vercel.app
 - server:
 
 ### DEMO LOGIN DETAILS
