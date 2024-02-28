@@ -1,7 +1,7 @@
 {
   "name": "gizmobuy-backend",
   "version": "1.0.0",
-  "description": "create apis for gizmobuy",
+  "description": "create apis for Gizmobuy",
   "main": "dist/server.js",
   "scripts": {
     "start:prod": "node ./dist/server.js",
