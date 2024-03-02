@@ -184,7 +184,7 @@ const changePasswordInDB = async (
   if (
     userFromDB?.email === 'babulakterfsd@gmail.com' ||
     userFromDB?.email === 'xpawal@gmail.com' ||
-    userFromDB?.email === 'awal.hostmail@gmail.com'
+    userFromDB?.email === 'belayet@gmail.com'
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -313,7 +313,7 @@ const forgetPasswordInDB = async (userEmail: string) => {
   if (
     userEmail === 'babulakterfsd@gmail.com' ||
     userEmail === 'xpawal@gmail.com' ||
-    userEmail === 'awal.hostmail@gmail.com'
+    userEmail === 'belayet@gmail.com'
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
