@@ -13,6 +13,7 @@ import {
 const router = express.Router();
 
 router.get('/get-profile', UserControllers.getUserProfile);
+router.post('/logout', UserControllers.logoutUser);
 
 router.post(
   '/register',

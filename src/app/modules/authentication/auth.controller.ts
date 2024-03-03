@@ -185,6 +185,21 @@ const getUserProfile = catchAsync(async (req, res) => {
   });
 });
 
+// logout user
+const logoutUser = catchAsync(async (req, res) => {
+  res.clearCookie('refreshfToken', {
+    secure: config.NODE_ENV === 'production',
+    httpOnly: true,
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Logged out successfully!',
+    data: null,
+  });
+});
+
 export const UserControllers = {
   registerUser,
   loginUser,
@@ -195,4 +210,5 @@ export const UserControllers = {
   resetForgottenPassword,
   updateUserProfile,
   getUserProfile,
+  logoutUser,
 };

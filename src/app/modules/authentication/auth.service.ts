@@ -491,6 +491,35 @@ const getuserFromDBByEmail = async (email: string) => {
   }
 };
 
+//logout user from db
+const logoutUserInDB = async (token: string) => {
+  if (!token) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Token is required');
+  }
+
+  // checking token is valid or not
+  let decodedUser: JwtPayload | string;
+
+  try {
+    decodedUser = jwt.verify(
+      token as string,
+      config.jwt_access_secret as string,
+    ) as JwtPayload;
+  } catch (error) {
+    throw new JsonWebTokenError('Unauthorized Access!');
+  }
+  const { email } = decodedUser as JwtPayload;
+
+  // checking if the user exists
+  const user = await UserModel.findOne({ email });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Unauthorized Access!');
+  }
+
+  return true;
+};
+
 export const UserServices = {
   registerUserInDB,
   loginUserInDB,
@@ -501,4 +530,5 @@ export const UserServices = {
   resetForgottenPasswordInDB,
   updateUserProfileInDB,
   getuserFromDBByEmail,
+  logoutUserInDB,
 };
