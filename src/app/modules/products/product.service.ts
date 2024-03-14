@@ -57,7 +57,7 @@ const getAllProductsFromDB = async (query: any) => {
   //sort
   const sortCheck: Record<string, 1 | -1> = {};
 
-  if (sortBy && ['price', 'stock', 'vendor', 'category'].includes(sortBy)) {
+  if (sortBy && ['price'].includes(sortBy)) {
     sortCheck[sortBy] = sortOrder === 'desc' ? -1 : 1;
   }
 
@@ -95,8 +95,7 @@ const getAllProductsFromDB = async (query: any) => {
 
   // fetch products
   const result = await ProductModel.find(filter)
-    // .sort(sortCheck)
-    .sort({ createdAt: -1 })
+    .sort(sortCheck)
     .skip(skip)
     .limit(limitToBeFetched);
 
