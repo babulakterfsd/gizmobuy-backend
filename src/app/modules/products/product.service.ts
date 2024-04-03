@@ -109,7 +109,22 @@ const getAllProductsFromDB = async (query: any) => {
   }
 };
 
+// get single product from DB
+const getSingleProductFromDB = async (id: string) => {
+  const result = await ProductModel.findById(id).populate('vendor');
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Failed to get the product with this id',
+    );
+  } else {
+    return result;
+  }
+};
+
 export const ProductServices = {
   createProductInDB,
   getAllProductsFromDB,
+  getSingleProductFromDB,
 };

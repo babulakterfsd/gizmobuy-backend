@@ -6,6 +6,7 @@ import { productValidationSchema } from './product.validation';
 
 const router = express.Router();
 
+//create product
 router.post(
   '/',
   auth('vendor'),
@@ -13,6 +14,10 @@ router.post(
   ProductControllers.createProduct,
 );
 
+// get single product
+router.get('/:id', ProductControllers.getSingleProduct);
+
+// get all products
 router.get('/', ProductControllers.getAllProducts);
 
 export const ProductRoutes = router;

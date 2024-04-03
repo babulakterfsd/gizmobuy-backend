@@ -15,7 +15,7 @@ const handleCastError = (
 
   return {
     statusCode,
-    message: 'Cast Error',
+    message: 'Cast Error! Invalid data type provided for a field',
     errorSources,
   };
 };
