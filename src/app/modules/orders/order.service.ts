@@ -27,7 +27,6 @@ const initiatePayment = async (order: TOrder) => {
   }
 
   // trnasaction to create order
-
   const session = await mongoose.startSession();
   try {
     session.startTransaction();

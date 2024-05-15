@@ -13,7 +13,6 @@ router.post(
   validateRequest(orderValidationSchema),
   OrderControllers.initPayment,
 );
-
 router.post('/success', OrderControllers.createOrder);
 router.post('/fail', OrderControllers.deleteOrderForFailedPayment);
 router.post('/cancel', OrderControllers.deleteOrderForCancelledPayment);
