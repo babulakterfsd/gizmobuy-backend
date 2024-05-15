@@ -8,7 +8,7 @@ const router = express.Router();
 
 //create order
 router.post(
-  '/',
+  '/init-payment',
   auth('customer'),
   validateRequest(orderValidationSchema),
   OrderControllers.initPayment,
