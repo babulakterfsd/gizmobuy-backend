@@ -21,4 +21,7 @@ export default {
       : process.env.CLIENT_URL,
 
   email_app_password: process.env.EMAIL_APP_PASSWORD,
+  store_id: process.env.STORE_ID,
+  store_passwd: process.env.STORE_PASSWD,
+  ssl_validation_api: process.env.SSL_VALIDATION_API,
 };

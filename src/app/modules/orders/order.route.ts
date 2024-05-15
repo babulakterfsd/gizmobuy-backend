@@ -11,7 +11,9 @@ router.post(
   '/',
   auth('customer'),
   validateRequest(orderValidationSchema),
-  OrderControllers.createOrder,
+  OrderControllers.initPayment,
 );
+
+router.post('/success', OrderControllers.createOrder);
 
 export const OrderRoutes = router;

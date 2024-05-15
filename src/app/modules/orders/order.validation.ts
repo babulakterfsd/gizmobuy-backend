@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
 export const orderValidationSchema = z.object({
+  orderId: z.string({
+    invalid_type_error: ' must be string',
+    required_error: ' is required',
+  }),
   products: z.array(
     z.object({
       id: z.string({
@@ -35,6 +39,10 @@ export const orderValidationSchema = z.object({
         .min(1, ' must be at least 0'),
     }),
   ),
+  customerName: z.string({
+    invalid_type_error: ' must be string',
+    required_error: ' is required',
+  }),
   orderBy: z.string({
     invalid_type_error: ' must be string',
     required_error: ' is required',

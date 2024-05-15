@@ -2,6 +2,7 @@
 
 export type TOrder = {
   _id: string;
+  orderId: string;
   products: {
     id: string;
     title: string;
@@ -9,6 +10,7 @@ export type TOrder = {
     quantity: number;
     billForThisProduct: number;
   }[];
+  customerName: string;
   orderBy: string;
   shippingInfo: {
     address: string;
