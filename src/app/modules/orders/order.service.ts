@@ -51,9 +51,9 @@ const initiatePayment = async (order: TOrder) => {
       0,
       10,
     )}${Date.now().toString().slice(7, 11)}`,
-    success_url: `https://gizmobuy-backend.vercel.app/api/orders/success?orderId=${order?.orderId}`,
-    fail_url: `https://gizmobuy-backend.vercel.app/api/orders/fail?orderId=${order?.orderId}`,
-    cancel_url: `https://gizmobuy-backend.vercel.app/api/orders/cancel?orderId=${order?.orderId}`,
+    success_url: `http://localhost:5000/api/orders/success?orderId=${order?.orderId}`,
+    fail_url: `http://localhost:5000/api/orders/fail?orderId=${order?.orderId}`,
+    cancel_url: `http://localhost:5000/api/orders/cancel?orderId=${order?.orderId}`,
     ipn_url: '',
     shipping_method: 'Courier',
     product_name: 'Gizmobuy',
@@ -111,7 +111,7 @@ const createOrderInDB = async (req: any) => {
     { new: true },
   );
 
-  return { redirectUrl: 'https://gizmobuy.vercel.app/order-success' };
+  return { redirectUrl: 'http://localhost:5173/order-success' };
 };
 
 // delete order from DB for failed payment
@@ -122,7 +122,7 @@ const deleteOrderForFailedPayment = async (req: any) => {
   // delete order
   await OrderModel.findOneAndDelete({ orderId });
 
-  return { redirectUrl: 'https://gizmobuy.vercel.app/order-fail' };
+  return { redirectUrl: 'http://localhost:5173/order-fail' };
 };
 
 // delete order from DB for cancelled payment
@@ -133,7 +133,7 @@ const deleteOrderForCancelledPayment = async (req: any) => {
   // delete order
   await OrderModel.findOneAndDelete({ orderId });
 
-  return { redirectUrl: 'https://gizmobuy.vercel.app/order-cancel' };
+  return { redirectUrl: 'http://localhost:5173/order-cancel' };
 };
 
 export const OrderServices = {
