@@ -22,7 +22,23 @@ const createOrder = catchAsync(async (req, res) => {
   res.redirect(result.redirectUrl);
 });
 
+//delete order for failed payment
+const deleteOrderForFailedPayment = catchAsync(async (req, res) => {
+  const result = await OrderServices.deleteOrderForFailedPayment(req);
+
+  res.redirect(result.redirectUrl);
+});
+
+//delete order for cancelled payment
+const deleteOrderForCancelledPayment = catchAsync(async (req, res) => {
+  const result = await OrderServices.deleteOrderForCancelledPayment(req);
+
+  res.redirect(result.redirectUrl);
+});
+
 export const OrderControllers = {
   initPayment,
   createOrder,
+  deleteOrderForFailedPayment,
+  deleteOrderForCancelledPayment,
 };

@@ -115,7 +115,31 @@ const createOrderInDB = async (req: any) => {
   return { redirectUrl: 'http://localhost:5173/order-success' };
 };
 
+// delete order from DB for failed payment
+const deleteOrderForFailedPayment = async (req: any) => {
+  const params = req.query;
+  const orderId = params?.orderId;
+
+  // delete order
+  await OrderModel.findOneAndDelete({ orderId });
+
+  return { redirectUrl: 'http://localhost:5173/order-fail' };
+};
+
+// delete order from DB for cancelled payment
+const deleteOrderForCancelledPayment = async (req: any) => {
+  const params = req.query;
+  const orderId = params?.orderId;
+
+  // delete order
+  await OrderModel.findOneAndDelete({ orderId });
+
+  return { redirectUrl: 'http://localhost:5173/order-cancel' };
+};
+
 export const OrderServices = {
   initiatePayment,
   createOrderInDB,
+  deleteOrderForFailedPayment,
+  deleteOrderForCancelledPayment,
 };

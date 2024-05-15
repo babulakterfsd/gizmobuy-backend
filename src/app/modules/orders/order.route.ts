@@ -15,5 +15,7 @@ router.post(
 );
 
 router.post('/success', OrderControllers.createOrder);
+router.post('/fail', OrderControllers.deleteOrderForFailedPayment);
+router.post('/cancel', OrderControllers.deleteOrderForCancelledPayment);
 
 export const OrderRoutes = router;
