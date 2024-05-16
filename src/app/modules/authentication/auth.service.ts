@@ -23,6 +23,18 @@ const registerUserInDB = async (user: TUser) => {
     user?.email,
   );
 
+  user = {
+    ...user,
+    address: {
+      address: '',
+      city: '',
+      state: '',
+      country: '',
+      postalCode: '',
+      mobile: '',
+    },
+  };
+
   if (isUserExistsWithEmail) {
     throw new Error(
       'User with this email already exists, please try with different  email.',
@@ -439,7 +451,7 @@ const updateUserProfileInDB = async (
     throw new JsonWebTokenError('Unauthorized Access!');
   }
 
-  const { name, profileImage, isBlocked } = dataToBeUpdated;
+  const { name, profileImage, isBlocked, address } = dataToBeUpdated;
 
   const result = await UserModel.findOneAndUpdate(
     { email: userFromDB?.email },
@@ -447,6 +459,24 @@ const updateUserProfileInDB = async (
       name: name ? name : userFromDB?.name,
       profileImage: profileImage ? profileImage : userFromDB?.profileImage,
       isBlocked: isBlocked ? isBlocked : userFromDB?.isBlocked,
+      address: address
+        ? {
+            address: address.address
+              ? address.address
+              : userFromDB?.address?.address,
+            city: address.city ? address.city : userFromDB?.address?.city,
+            state: address.state ? address.state : userFromDB?.address?.state,
+            postalCode: address.postalCode
+              ? address.postalCode
+              : userFromDB?.address?.postalCode,
+            country: address.country
+              ? address.country
+              : userFromDB?.address?.country,
+            mobile: address.mobile
+              ? address.mobile
+              : userFromDB?.address?.mobile,
+          }
+        : userFromDB?.address,
     },
     {
       new: true,
@@ -464,6 +494,7 @@ const updateUserProfileInDB = async (
     role: result?.role,
     profileImage: result?.profileImage,
     isBlocked: result?.isBlocked,
+    address: result?.address,
   };
 
   return modifiedResult;
@@ -485,6 +516,7 @@ const getuserFromDBByEmail = async (email: string) => {
       profileImage: userFromDB?.profileImage,
       isEmailVerified: userFromDB?.isEmailVerified,
       isBlocked: userFromDB?.isBlocked,
+      address: userFromDB?.address,
     };
 
     return modifiedUser;

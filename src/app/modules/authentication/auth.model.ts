@@ -65,6 +65,26 @@ const userSchema = new Schema<TUser, TUserModel>(
       required: [true, 'isBlocked is required'],
       default: false,
     },
+    address: {
+      address: {
+        type: String,
+      },
+      city: {
+        type: String,
+      },
+      state: {
+        type: String,
+      },
+      country: {
+        type: String,
+      },
+      postalCode: {
+        type: String,
+      },
+      mobile: {
+        type: String,
+      },
+    },
   },
   {
     timestamps: true,

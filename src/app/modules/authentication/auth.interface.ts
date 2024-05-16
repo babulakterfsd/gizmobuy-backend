@@ -21,6 +21,14 @@ export type TUser = {
   lastTwoPasswords?: TLastPassword[];
   profileImage?: string;
   isBlocked: boolean;
+  address?: {
+    address?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    postalCode?: string;
+    mobile?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
   __v: number;
@@ -30,6 +38,14 @@ export type TUserProfileDataToBeUpdated = {
   name?: string;
   profileImage?: string;
   isBlocked?: boolean;
+  address?: {
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+    mobile: string;
+  };
 };
 
 export type TUserRole = 'admin' | 'vendor' | 'customer';

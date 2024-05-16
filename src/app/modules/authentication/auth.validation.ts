@@ -51,6 +51,28 @@ export const userSchema = z.object({
     invalid_type_error: ' must be boolean',
     required_error: ' is required',
   }),
+  address: z
+    .object({
+      address: z.string({
+        invalid_type_error: ' must be string',
+      }),
+      city: z.string({
+        invalid_type_error: ' must be string',
+      }),
+      state: z.string({
+        invalid_type_error: ' must be string',
+      }),
+      country: z.string({
+        invalid_type_error: ' must be string',
+      }),
+      postalCode: z.string({
+        invalid_type_error: ' must be string',
+      }),
+      mobile: z.string({
+        invalid_type_error: ' must be string',
+      }),
+    })
+    .optional(),
 });
 
 export const signupSchema = z.object({
@@ -129,6 +151,40 @@ export const updateProfileSchema = z.object({
     .boolean({
       invalid_type_error: ' must be boolean',
       required_error: ' is required',
+    })
+    .optional(),
+  address: z
+    .object({
+      address: z
+        .string({
+          invalid_type_error: ' must be string',
+        })
+        .optional(),
+      city: z
+        .string({
+          invalid_type_error: ' must be string',
+        })
+        .optional(),
+      state: z
+        .string({
+          invalid_type_error: ' must be string',
+        })
+        .optional(),
+      country: z
+        .string({
+          invalid_type_error: ' must be string',
+        })
+        .optional(),
+      postalCode: z
+        .string({
+          invalid_type_error: ' must be string',
+        })
+        .optional(),
+      mobile: z
+        .string({
+          invalid_type_error: ' must be string',
+        })
+        .optional(),
     })
     .optional(),
 });
