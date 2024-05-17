@@ -194,9 +194,9 @@ const changePasswordInDB = async (
   }
 
   if (
-    userFromDB?.email === 'babulakterfsd@gmail.com' ||
-    userFromDB?.email === 'xpawal@gmail.com' ||
-    userFromDB?.email === 'belayet@gmail.com'
+    userFromDB?.email === 'demoadmin@gmail.com' ||
+    userFromDB?.email === 'democustomer@gmail.com' ||
+    userFromDB?.email === 'demovendor@gmail.com'
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -323,9 +323,9 @@ const forgetPasswordInDB = async (userEmail: string) => {
   }
 
   if (
-    userEmail === 'babulakterfsd@gmail.com' ||
-    userEmail === 'xpawal@gmail.com' ||
-    userEmail === 'belayet@gmail.com'
+    userEmail === 'demoadmin@gmail.com' ||
+    userEmail === 'democustomer@gmail.com' ||
+    userEmail === 'demovendor@gmail.com'
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -370,9 +370,9 @@ const resetForgottenPasswordInDB = async (
       'New password must be minimum 6 characters and include both letters and numbers',
     );
   } else if (
-    userEmail === 'babulakterfsd@gmail.com' ||
-    userEmail === 'xpawal@gmail.com' ||
-    userEmail === 'awal.hostmail@gmail.com'
+    userEmail === 'demoadmin@gmail.com' ||
+    userEmail === 'democustomer@gmail.com' ||
+    userEmail === 'demovendor@gmail.com'
   ) {
     throw new Error('Password reset is not allowed for this demo account');
   }
