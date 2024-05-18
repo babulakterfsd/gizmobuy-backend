@@ -69,4 +69,18 @@ router.get(
   UserControllers.getCustomerDashboardOverviewData,
 );
 
+// get all vendors for admin
+router.get(
+  '/getallvendors',
+  auth('admin'),
+  UserControllers.getAllVendorsForAdmin,
+);
+
+// get all customers for admin
+router.get(
+  '/getallcustomers',
+  auth('admin'),
+  UserControllers.getAllCustomersForAdmin,
+);
+
 export const AuthRoutes = router;

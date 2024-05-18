@@ -266,6 +266,52 @@ const getCustomerDashboardOverviewData = catchAsync(async (req, res) => {
   });
 });
 
+// get all vendors for admin
+const getAllVendorsForAdmin = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const result = await UserServices.getAllVendorsFromDB(
+    decodedUser as TDecodedUser,
+    req,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All vendors have been retrieved succesfully',
+    data: result,
+  });
+});
+
+// get all customers for admin
+const getAllCustomersForAdmin = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const result = await UserServices.getAllCustomersFromDB(
+    decodedUser as TDecodedUser,
+    req,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All customers have been retrieved succesfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   registerUser,
   loginUser,
@@ -280,4 +326,6 @@ export const UserControllers = {
   getAdminDashboardOverviewData,
   getVendorDashboardOverviewData,
   getCustomerDashboardOverviewData,
+  getAllVendorsForAdmin,
+  getAllCustomersForAdmin,
 };

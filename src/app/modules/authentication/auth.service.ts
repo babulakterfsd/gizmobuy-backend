@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../errors/AppError';
 
+import { Request } from 'express';
 import { sendEmail } from '../../utils/sendEmail';
 import { OrderModel } from '../orders/order.model';
 import { ProductModel } from '../products/product.model';
@@ -73,6 +74,9 @@ const loginUserInDB = async (user: TUser) => {
   const userFromDB = await UserModel.isUserExistsWithEmail(user?.email);
   if (!userFromDB) {
     throw new Error('No user found with this email');
+  }
+  if (userFromDB.isBlocked) {
+    throw new Error('User is blocked');
   }
   const isPasswordMatched = await bcrypt.compare(
     user?.password,
@@ -664,6 +668,95 @@ const getCustomerDashboardOverviewDataFromDB = async (
   };
 };
 
+// get all vendors for admin to manage
+const getAllVendorsFromDB = async (decodedUser: TDecodedUser, req: Request) => {
+  const { role } = decodedUser;
+  if (role !== 'admin') {
+    throw new Error('Unauthorized Access');
+  }
+
+  const { page, limit, search } = req?.query;
+
+  //implement pagination
+  const pageToBeFetched = Number(page) || 1;
+  const limitToBeFetched = Number(limit) || 5;
+  const skip = (pageToBeFetched - 1) * limitToBeFetched;
+
+  // search by name or email
+  const filter: Record<string, any> = {};
+  filter.role = 'vendor';
+
+  if (search) {
+    filter.$or = [
+      { name: new RegExp(String(search), 'i') },
+      { email: new RegExp(String(search), 'i') },
+    ];
+  }
+
+  const result = await UserModel.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitToBeFetched);
+
+  return result?.map((vendor) => {
+    return {
+      _id: vendor._id,
+      name: vendor.name,
+      email: vendor.email,
+      isEmailVerified: vendor.isEmailVerified,
+      isBlocked: vendor.isBlocked,
+      address: vendor.address,
+      role: vendor.role,
+    };
+  });
+};
+
+// get all customers for admin to manage
+const getAllCustomersFromDB = async (
+  decodedUser: TDecodedUser,
+  req: Request,
+) => {
+  const { role } = decodedUser;
+  if (role !== 'admin') {
+    throw new Error('Unauthorized Access');
+  }
+
+  const { page, limit, search } = req?.query;
+
+  //implement pagination
+  const pageToBeFetched = Number(page) || 1;
+  const limitToBeFetched = Number(limit) || 5;
+  const skip = (pageToBeFetched - 1) * limitToBeFetched;
+
+  // search by name or email
+  const filter: Record<string, any> = {};
+  filter.role = 'customer';
+
+  if (search) {
+    filter.$or = [
+      { name: new RegExp(String(search), 'i') },
+      { email: new RegExp(String(search), 'i') },
+    ];
+  }
+
+  const result = await UserModel.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitToBeFetched);
+
+  return result?.map((customer) => {
+    return {
+      _id: customer._id,
+      name: customer.name,
+      email: customer.email,
+      isEmailVerified: customer.isEmailVerified,
+      isBlocked: customer.isBlocked,
+      address: customer.address,
+      role: customer.role,
+    };
+  });
+};
+
 export const UserServices = {
   registerUserInDB,
   loginUserInDB,
@@ -678,4 +771,6 @@ export const UserServices = {
   getAdminDashboardOverviewDataFromDB,
   getVendorDashboardOverviewDataFromDB,
   getCustomerDashboardOverviewDataFromDB,
+  getAllVendorsFromDB,
+  getAllCustomersFromDB,
 };
