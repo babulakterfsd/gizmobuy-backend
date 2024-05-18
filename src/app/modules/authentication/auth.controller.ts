@@ -200,6 +200,72 @@ const logoutUser = catchAsync(async (req, res) => {
   });
 });
 
+// get admin dashboard overview data
+const getAdminDashboardOverviewData = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const result = await UserServices.getAdminDashboardOverviewDataFromDB(
+    decodedUser as TDecodedUser,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Admin overview data has been retrieved succesfully',
+    data: result,
+  });
+});
+
+// get vendor dashboard overview data
+const getVendorDashboardOverviewData = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const result = await UserServices.getVendorDashboardOverviewDataFromDB(
+    decodedUser as TDecodedUser,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Vendor overview data has been retrieved succesfully',
+    data: result,
+  });
+});
+
+// get customer dashboard overview data
+const getCustomerDashboardOverviewData = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const result = await UserServices.getCustomerDashboardOverviewDataFromDB(
+    decodedUser as TDecodedUser,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Customer overview data has been retrieved succesfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   registerUser,
   loginUser,
@@ -211,4 +277,7 @@ export const UserControllers = {
   updateUserProfile,
   getUserProfile,
   logoutUser,
+  getAdminDashboardOverviewData,
+  getVendorDashboardOverviewData,
+  getCustomerDashboardOverviewData,
 };

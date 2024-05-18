@@ -1,4 +1,5 @@
 import express from 'express';
+import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { UserControllers } from './auth.controller';
 import {
@@ -50,5 +51,22 @@ router.put(
 router.post('/verify-token', UserControllers.verifyToken);
 
 router.post('/refresh-token', UserControllers.getAccessTokenUsingRefreshToken);
+
+//get admin, customer and vendor overview data
+router.get(
+  '/getadminoverviewdata',
+  auth('admin'),
+  UserControllers.getAdminDashboardOverviewData,
+);
+router.get(
+  '/getvendoroverviewdata',
+  auth('vendor'),
+  UserControllers.getVendorDashboardOverviewData,
+);
+router.get(
+  '/getcustomeroverviewdata',
+  auth('customer'),
+  UserControllers.getCustomerDashboardOverviewData,
+);
 
 export const AuthRoutes = router;

@@ -8,6 +8,8 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 
 import { sendEmail } from '../../utils/sendEmail';
+import { OrderModel } from '../orders/order.model';
+import { ProductModel } from '../products/product.model';
 import {
   TChangePasswordData,
   TDecodedUser,
@@ -552,6 +554,116 @@ const logoutUserInDB = async (token: string) => {
   return true;
 };
 
+// get admin dashboard overview data
+const getAdminDashboardOverviewDataFromDB = async (
+  decodedUser: TDecodedUser,
+) => {
+  const { role } = decodedUser;
+  if (role !== 'admin') {
+    throw new Error('Unauthorized Access');
+  }
+  const totalUsersOfGizmobuy = await UserModel.find();
+  const totalAdminsOfGizmobuy = await UserModel.find({ role: 'admin' });
+  const totalVendorsOfGizmobuy = await UserModel.find({ role: 'vendor' });
+  const totalCustomersOfGizmobuy = await UserModel.find({ role: 'customer' });
+  const totalProductsOfGizmobuy = await ProductModel.find();
+  const totalOrdersOfGizmobuy = await OrderModel.find();
+  const totalSellByAllVendors = await OrderModel.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: '$totalBill' },
+      },
+    },
+  ]);
+
+  return {
+    totalUsers: totalUsersOfGizmobuy.length,
+    totalAdmin: totalAdminsOfGizmobuy.length,
+    totalVendor: totalVendorsOfGizmobuy.length,
+    totalCustomer: totalCustomersOfGizmobuy.length,
+    totalProduct: totalProductsOfGizmobuy.length,
+    totalOrders: totalOrdersOfGizmobuy.length,
+    totalSellByAllVendors: totalSellByAllVendors[0]?.totalRevenue,
+    totalProfitOfGizmobuy: +(
+      (totalSellByAllVendors[0]?.totalRevenue * 5) /
+      100
+    ).toFixed(2),
+  };
+};
+
+// get vendor dashboard overview data
+const getVendorDashboardOverviewDataFromDB = async (
+  decodedUser: TDecodedUser,
+) => {
+  const { role, email, _id } = decodedUser;
+  if (role !== 'vendor') {
+    throw new Error('Unauthorized Access');
+  }
+
+  const vendor = await UserModel.findOne({ email });
+
+  if (!vendor) {
+    throw new Error('Vendor not found');
+  }
+
+  // find how many products the vendor has
+  const products = await ProductModel.find();
+  const totalProductsOfThisVendor = products.filter(
+    (product) => product.vendor.toString() === _id.toString(),
+  );
+
+  const joinDate = vendor?.createdAt.toDateString();
+
+  return {
+    joined: joinDate,
+    totalProductsOfThisVendor: totalProductsOfThisVendor.length,
+  };
+};
+
+// get customer dashboard overview data
+const getCustomerDashboardOverviewDataFromDB = async (
+  decodedUser: TDecodedUser,
+) => {
+  const { role, email } = decodedUser;
+  if (role !== 'customer') {
+    throw new Error('Unauthorized Access');
+  }
+  const customer = await UserModel.findOne({ email });
+
+  if (!customer) {
+    throw new Error('Customer not found');
+  }
+
+  const completedOrder = await OrderModel.find({
+    orderBy: email,
+    orderStatus: 'delivered',
+  });
+  const pendingOrder = await OrderModel.find({
+    orderBy: email,
+    orderStatus: 'processing',
+  });
+  const totalBillPaid = await OrderModel.aggregate([
+    {
+      $match: {
+        orderBy: email,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalBillPaid: { $sum: '$totalBill' },
+      },
+    },
+  ]);
+
+  return {
+    pendingOrder: pendingOrder.length,
+    completedOrder: completedOrder.length,
+    totalBillPaid: totalBillPaid[0]?.totalBillPaid,
+  };
+};
+
 export const UserServices = {
   registerUserInDB,
   loginUserInDB,
@@ -563,4 +675,7 @@ export const UserServices = {
   updateUserProfileInDB,
   getuserFromDBByEmail,
   logoutUserInDB,
+  getAdminDashboardOverviewDataFromDB,
+  getVendorDashboardOverviewDataFromDB,
+  getCustomerDashboardOverviewDataFromDB,
 };
