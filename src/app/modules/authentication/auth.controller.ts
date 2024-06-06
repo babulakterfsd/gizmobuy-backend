@@ -312,6 +312,32 @@ const getAllCustomersForAdmin = catchAsync(async (req, res) => {
   });
 });
 
+// block or unblock user by admin
+const blockOrUnblockUserByAdmin = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const { id, block } = req.body;
+
+  const result = await UserServices.blockOrUnblockUserInDB(
+    decodedUser as TDecodedUser,
+    id,
+    block,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User has been blocked/unblocked succesfully',
+    data: result,
+  });
+});
+
 export const UserControllers = {
   registerUser,
   loginUser,
@@ -328,4 +354,5 @@ export const UserControllers = {
   getCustomerDashboardOverviewData,
   getAllVendorsForAdmin,
   getAllCustomersForAdmin,
+  blockOrUnblockUserByAdmin,
 };

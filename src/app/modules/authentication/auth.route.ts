@@ -83,4 +83,11 @@ router.get(
   UserControllers.getAllCustomersForAdmin,
 );
 
+// block or unblock user by admin
+router.post(
+  '/blockorunblockuser',
+  auth('admin'),
+  UserControllers.blockOrUnblockUserByAdmin,
+);
+
 export const AuthRoutes = router;

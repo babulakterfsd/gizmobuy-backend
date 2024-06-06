@@ -676,6 +676,15 @@ const getAllVendorsFromDB = async (decodedUser: TDecodedUser, req: Request) => {
   }
 
   const { page, limit, search } = req?.query;
+  const totalDocs = await UserModel.countDocuments({
+    role: 'vendor',
+  });
+
+  const meta = {
+    page: Number(page) || 1,
+    limit: Number(limit) || 10,
+    total: totalDocs,
+  };
 
   //implement pagination
   const pageToBeFetched = Number(page) || 1;
@@ -698,17 +707,21 @@ const getAllVendorsFromDB = async (decodedUser: TDecodedUser, req: Request) => {
     .skip(skip)
     .limit(limitToBeFetched);
 
-  return result?.map((vendor) => {
-    return {
-      _id: vendor._id,
-      name: vendor.name,
-      email: vendor.email,
-      isEmailVerified: vendor.isEmailVerified,
-      isBlocked: vendor.isBlocked,
-      address: vendor.address,
-      role: vendor.role,
-    };
-  });
+  return {
+    meta,
+    data: result?.map((vendor) => {
+      return {
+        _id: vendor._id,
+        name: vendor.name,
+        email: vendor.email,
+        profileImage: vendor.profileImage,
+        isEmailVerified: vendor.isEmailVerified,
+        isBlocked: vendor.isBlocked,
+        address: vendor.address,
+        role: vendor.role,
+      };
+    }),
+  };
 };
 
 // get all customers for admin to manage
@@ -722,15 +735,11 @@ const getAllCustomersFromDB = async (
   }
 
   const { page, limit, search } = req?.query;
-
-  //implement pagination
   const pageToBeFetched = Number(page) || 1;
-  const limitToBeFetched = Number(limit) || 5;
+  const limitToBeFetched = Number(limit) || 10;
   const skip = (pageToBeFetched - 1) * limitToBeFetched;
 
-  // search by name or email
-  const filter: Record<string, any> = {};
-  filter.role = 'customer';
+  const filter: Record<string, any> = { role: 'customer' };
 
   if (search) {
     filter.$or = [
@@ -739,22 +748,87 @@ const getAllCustomersFromDB = async (
     ];
   }
 
-  const result = await UserModel.find(filter)
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limitToBeFetched);
+  const totalDocs = await UserModel.countDocuments(filter);
 
-  return result?.map((customer) => {
-    return {
-      _id: customer._id,
-      name: customer.name,
-      email: customer.email,
-      isEmailVerified: customer.isEmailVerified,
-      isBlocked: customer.isBlocked,
-      address: customer.address,
-      role: customer.role,
-    };
+  const meta = {
+    page: pageToBeFetched,
+    limit: limitToBeFetched,
+    total: totalDocs,
+  };
+
+  const result = await UserModel.aggregate([
+    { $match: filter },
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: limitToBeFetched },
+    {
+      $lookup: {
+        from: 'orders',
+        localField: 'email',
+        foreignField: 'orderBy',
+        as: 'ordersData',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        profileImage: 1,
+        email: 1,
+        isEmailVerified: 1,
+        isBlocked: 1,
+        address: 1,
+        role: 1,
+        totalOrders: { $size: '$ordersData' },
+        totalPaid: { $sum: '$ordersData.totalAmount' },
+      },
+    },
+  ]);
+
+  return {
+    meta,
+    data: result.map((customer) => {
+      return {
+        _id: customer._id,
+        name: customer.name,
+        profileImage: customer.profileImage,
+        email: customer.email,
+        isEmailVerified: customer.isEmailVerified,
+        isBlocked: customer.isBlocked,
+        address: customer.address,
+        role: customer.role,
+        totalOrders: customer.totalOrders,
+        totalPaid: customer.totalPaid,
+      };
+    }),
+  };
+};
+
+// block or unblock a vendor or customer by admin
+const blockOrUnblockUserInDB = async (
+  decodedUser: TDecodedUser,
+  userId: string,
+  block: boolean,
+) => {
+  const { role } = decodedUser;
+  if (role !== 'admin') {
+    throw new Error('Unauthorized Access');
+  }
+
+  const user = await UserModel.findById({
+    _id: new mongoose.Types.ObjectId(userId),
   });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  user.isBlocked = block;
+  await user.save();
+  return {
+    message: block
+      ? `${user?.role} is blocked now !`
+      : `${user?.role} is unblocked now !`,
+  };
 };
 
 export const UserServices = {
@@ -773,4 +847,5 @@ export const UserServices = {
   getCustomerDashboardOverviewDataFromDB,
   getAllVendorsFromDB,
   getAllCustomersFromDB,
+  blockOrUnblockUserInDB,
 };
