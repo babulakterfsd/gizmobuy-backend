@@ -651,6 +651,7 @@ const getCustomerDashboardOverviewDataFromDB = async (
     {
       $match: {
         orderBy: email,
+        isPaid: true,
       },
     },
     {
@@ -664,7 +665,7 @@ const getCustomerDashboardOverviewDataFromDB = async (
   return {
     pendingOrder: pendingOrder.length,
     completedOrder: completedOrder.length,
-    totalBillPaid: totalBillPaid[0]?.totalBillPaid,
+    totalBillPaid: totalBillPaid[0]?.totalBillPaid || 0,
   };
 };
 
