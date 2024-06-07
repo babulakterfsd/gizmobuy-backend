@@ -48,13 +48,13 @@
 ### DEMO LOGIN DETAILS
 
       * Customer :
-          - email:
-          - password:
+          - email: democustomer@gmail.com
+          - password: customer123
 
       * Vendor :
-          - email:
-          - password:
+          - email: demovendor@gmail.com
+          - password: vendor123
 
       * Admin :
-          - email:
-          - password:
+          - email: demoadmin@gmail.com
+          - password: admin123
