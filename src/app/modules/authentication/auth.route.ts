@@ -84,7 +84,7 @@ router.get(
 );
 
 // block or unblock user by admin
-router.post(
+router.put(
   '/blockorunblockuser',
   auth('admin'),
   UserControllers.blockOrUnblockUserByAdmin,

@@ -822,8 +822,16 @@ const blockOrUnblockUserInDB = async (
     throw new Error('User not found');
   }
 
-  user.isBlocked = block;
-  await user.save();
+  const result = await UserModel.findByIdAndUpdate(
+    { _id: new mongoose.Types.ObjectId(userId) },
+    { isBlocked: block },
+    { new: true },
+  );
+
+  if (!result) {
+    throw new Error('Something went wrong !');
+  }
+
   return {
     message: block
       ? `${user?.role} is blocked now !`
