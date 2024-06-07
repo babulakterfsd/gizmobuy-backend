@@ -765,8 +765,19 @@ const getAllCustomersFromDB = async (
     {
       $lookup: {
         from: 'orders',
-        localField: 'email',
-        foreignField: 'orderBy',
+        let: { userEmail: '$email' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$orderBy', '$$userEmail'] },
+                  { $eq: ['$isPaid', true] },
+                ],
+              },
+            },
+          },
+        ],
         as: 'ordersData',
       },
     },
@@ -781,7 +792,7 @@ const getAllCustomersFromDB = async (
         address: 1,
         role: 1,
         totalOrders: { $size: '$ordersData' },
-        totalPaid: { $sum: '$ordersData.totalAmount' },
+        totalPaid: { $sum: '$ordersData.totalBill' },
       },
     },
   ]);
