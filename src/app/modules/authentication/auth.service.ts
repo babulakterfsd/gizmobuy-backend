@@ -571,12 +571,23 @@ const getAdminDashboardOverviewDataFromDB = async (
   const totalVendorsOfGizmobuy = await UserModel.find({ role: 'vendor' });
   const totalCustomersOfGizmobuy = await UserModel.find({ role: 'customer' });
   const totalProductsOfGizmobuy = await ProductModel.find();
-  const totalOrdersOfGizmobuy = await OrderModel.find();
+  const totalOrdersOfGizmobuy = await OrderModel.find({
+    isPaid: true,
+  });
+
+  // get total sell by all vendors of gizmobuy (only paid orders)
   const totalSellByAllVendors = await OrderModel.aggregate([
+    {
+      $match: {
+        isPaid: true,
+      },
+    },
     {
       $group: {
         _id: null,
-        totalRevenue: { $sum: '$totalBill' },
+        totalRevenue: {
+          $sum: '$totalBill',
+        },
       },
     },
   ]);
