@@ -31,3 +31,8 @@ export type TOrder = {
   discountGiven: number;
   totalBill: number;
 };
+
+export type TOrderQuery = {
+  orderBy?: string;
+  dataOfSell?: string;
+};

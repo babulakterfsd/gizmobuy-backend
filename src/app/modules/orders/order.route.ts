@@ -17,4 +17,7 @@ router.post('/success', OrderControllers.createOrder);
 router.post('/fail', OrderControllers.deleteOrderForFailedPayment);
 router.post('/cancel', OrderControllers.deleteOrderForCancelledPayment);
 
+// sells history
+router.get('/sells-history', auth('admin'), OrderControllers.getAllOrdersData);
+
 export const OrderRoutes = router;

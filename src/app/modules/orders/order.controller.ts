@@ -36,9 +36,22 @@ const deleteOrderForCancelledPayment = catchAsync(async (req, res) => {
   res.redirect(result.redirectUrl);
 });
 
+// get all orders data
+const getAllOrdersData = catchAsync(async (req, res) => {
+  const result = await OrderServices.getAllOrdersDataFromDB(req, req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Orders data fetched successfully',
+    data: result,
+  });
+});
+
 export const OrderControllers = {
   initPayment,
   createOrder,
   deleteOrderForFailedPayment,
   deleteOrderForCancelledPayment,
+  getAllOrdersData,
 };

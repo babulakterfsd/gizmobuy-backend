@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../errors/AppError';
+import { getFormattedDate, getTodaysDate } from '../../utils/dateFormater';
 import { ProductModel } from '../products/product.model';
 import { TOrder } from './order.interface';
 import { OrderModel } from './order.model';
@@ -136,9 +137,88 @@ const deleteOrderForCancelledPayment = async (req: any) => {
   return { redirectUrl: 'http://localhost:5173/order-cancel' };
 };
 
+// get sells history for admin
+const getAllOrdersDataFromDB = async (req: any, query: any) => {
+  const { page, limit, timeframe, customersEmail } = query;
+  let startDate;
+
+  //implement pagination
+  const pageToBeFetched = Number(page) || 1;
+  const limitToBeFetched = Number(limit) || 10;
+  const skip = (pageToBeFetched - 1) * limitToBeFetched;
+
+  // Calculate the start date based on the specified timeframe
+  let weekAgo;
+  let monthAgo;
+  let yearAgo;
+  switch (timeframe) {
+    case 'daily':
+      startDate = getTodaysDate();
+      break;
+    case 'weekly':
+      weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      startDate = getFormattedDate(weekAgo);
+      break;
+    case 'monthly':
+      monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      startDate = getFormattedDate(monthAgo);
+      break;
+    case 'yearly':
+      yearAgo = new Date();
+      yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+      startDate = getFormattedDate(yearAgo);
+      break;
+    default:
+      startDate = '1970-01-01';
+  }
+
+  // filter
+  const filter: Record<string, any> = {};
+
+  if (timeframe) {
+    filter.createdAt = {
+      $gte: startDate,
+    };
+  }
+
+  if (customersEmail) {
+    filter.orderBy = customersEmail;
+  }
+
+  // Query the database with the specified timeframe
+  const orderHistory = await OrderModel.find(filter)
+    .sort({
+      createdAt: -1,
+    })
+    .skip(skip)
+    .limit(limitToBeFetched);
+
+  const gizmoBuyProfit = Number(
+    (orderHistory
+      .filter((order: any) => order.isPaid)
+      .reduce((acc: any, order: any) => acc + order.totalBill, 0) *
+      5) /
+      100,
+  ).toFixed(2);
+
+  const reultToBereturned = {
+    completedSells: orderHistory.filter((order: any) => order.isPaid)?.length,
+    totalSells: orderHistory
+      .filter((order: any) => order.isPaid)
+      .reduce((acc: any, order: any) => acc + order.totalBill, 0),
+    gizmobuyProfit: +gizmoBuyProfit,
+    orders: orderHistory,
+  };
+
+  return reultToBereturned;
+};
+
 export const OrderServices = {
   initiatePayment,
   createOrderInDB,
   deleteOrderForFailedPayment,
   deleteOrderForCancelledPayment,
+  getAllOrdersDataFromDB,
 };
