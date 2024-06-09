@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../errors/AppError';
 import { getFormattedDate, getTodaysDate } from '../../utils/dateFormater';
+import { TDecodedUser } from '../authentication/auth.interface';
 import { ProductModel } from '../products/product.model';
 import { TOrder } from './order.interface';
 import { OrderModel } from './order.model';
@@ -215,10 +216,28 @@ const getAllOrdersDataFromDB = async (req: any, query: any) => {
   return reultToBereturned;
 };
 
+// get my orders for customer
+const getMyOrdersDataFromDB = async (decodedUser: TDecodedUser) => {
+  const { email } = decodedUser;
+
+  // delete my unpaid orders
+  await OrderModel.deleteMany({
+    orderBy: email,
+    isPaid: false,
+  });
+
+  const myOrders = await OrderModel.find({ orderBy: email }).sort({
+    createdAt: -1,
+  });
+
+  return myOrders;
+};
+
 export const OrderServices = {
   initiatePayment,
   createOrderInDB,
   deleteOrderForFailedPayment,
   deleteOrderForCancelledPayment,
   getAllOrdersDataFromDB,
+  getMyOrdersDataFromDB,
 };

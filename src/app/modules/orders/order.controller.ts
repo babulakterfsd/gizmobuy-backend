@@ -1,6 +1,9 @@
 import httpStatus from 'http-status';
+import jwt from 'jsonwebtoken';
+import config from '../../config';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
+import { TDecodedUser } from '../authentication/auth.interface';
 import { OrderServices } from './order.service';
 
 // init payment
@@ -48,10 +51,33 @@ const getAllOrdersData = catchAsync(async (req, res) => {
   });
 });
 
+// get my orders data for customer
+const getMyOrdersData = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const result = await OrderServices.getMyOrdersDataFromDB(
+    decodedUser as TDecodedUser,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'My orders data fetched successfully',
+    data: result,
+  });
+});
+
 export const OrderControllers = {
   initPayment,
   createOrder,
   deleteOrderForFailedPayment,
   deleteOrderForCancelledPayment,
   getAllOrdersData,
+  getMyOrdersData,
 };

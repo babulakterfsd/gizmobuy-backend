@@ -20,4 +20,7 @@ router.post('/cancel', OrderControllers.deleteOrderForCancelledPayment);
 // sells history
 router.get('/sells-history', auth('admin'), OrderControllers.getAllOrdersData);
 
+// get my orders
+router.get('/my-orders', auth('customer'), OrderControllers.getMyOrdersData);
+
 export const OrderRoutes = router;
