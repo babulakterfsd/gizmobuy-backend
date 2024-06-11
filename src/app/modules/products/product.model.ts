@@ -60,9 +60,12 @@ const productSchema = new Schema<TProduct, TProductModel>(
       maxlength: 800,
     },
     vendor: {
-      type: Schema.Types.ObjectId,
-      ref: 'users',
+      type: String,
       required: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        'Vendor email is not valid',
+      ],
     },
     runningDiscount: {
       type: Number,

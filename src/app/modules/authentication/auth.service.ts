@@ -611,7 +611,7 @@ const getAdminDashboardOverviewDataFromDB = async (
 const getVendorDashboardOverviewDataFromDB = async (
   decodedUser: TDecodedUser,
 ) => {
-  const { role, email, _id } = decodedUser;
+  const { role, email } = decodedUser;
   if (role !== 'vendor') {
     throw new Error('Unauthorized Access');
   }
@@ -625,7 +625,7 @@ const getVendorDashboardOverviewDataFromDB = async (
   // find how many products the vendor has
   const products = await ProductModel.find();
   const totalProductsOfThisVendor = products.filter(
-    (product) => product.vendor.toString() === _id.toString(),
+    (product) => product.vendor === email,
   );
 
   const joinDate = vendor?.createdAt.toDateString();

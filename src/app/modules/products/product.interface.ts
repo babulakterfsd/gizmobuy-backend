@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 
 export type TProduct = {
   _id: string;
@@ -12,7 +12,7 @@ export type TProduct = {
   photos: string[];
   displayImage: string;
   description: string;
-  vendor: Types.ObjectId;
+  vendor: string;
   runningDiscount: number;
   releaseDate: string;
 };

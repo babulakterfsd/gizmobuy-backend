@@ -6,6 +6,13 @@ import { productValidationSchema } from './product.validation';
 
 const router = express.Router();
 
+// get all products for vendor dashboard
+router.get(
+  '/manage-products',
+  auth('vendor'),
+  ProductControllers.getAllProductsOfAVendorToManage,
+);
+
 //create product
 router.post(
   '/',
@@ -13,6 +20,9 @@ router.post(
   validateRequest(productValidationSchema),
   ProductControllers.createProduct,
 );
+
+// delete a single product
+router.delete('/:id', auth('vendor'), ProductControllers.deleteProduct);
 
 // get single product
 router.get('/:id', ProductControllers.getSingleProduct);

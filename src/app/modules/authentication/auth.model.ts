@@ -91,6 +91,7 @@ const userSchema = new Schema<TUser, TUserModel>(
     toJSON: {
       transform(doc, ret) {
         delete ret.password;
+        delete ret.lastTwoPasswords;
         delete ret.__v;
       },
     },

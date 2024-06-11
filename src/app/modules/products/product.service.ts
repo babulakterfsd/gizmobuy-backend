@@ -1,5 +1,7 @@
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
+import { TDecodedUser } from '../authentication/auth.interface';
+import { UserModel } from '../authentication/auth.model';
 import { TProduct } from './product.interface';
 import { ProductModel } from './product.model';
 
@@ -44,8 +46,8 @@ const getAllProductsFromDB = async (query: any) => {
   const totalDocs = await ProductModel.countDocuments();
 
   const meta = {
-    page: Number(page),
-    limit: Number(limit),
+    page: Number(page) || 1,
+    limit: Number(limit) || 10,
     total: totalDocs,
   };
 
@@ -112,6 +114,15 @@ const getAllProductsFromDB = async (query: any) => {
 // get single product from DB
 const getSingleProductFromDB = async (id: string) => {
   const result = await ProductModel.findById(id).populate('vendor');
+  const vendor = result?.vendor;
+  const vendorDetails = await UserModel.findOne({ email: vendor });
+
+  const resultToBeReturned = {
+    ...result?.toObject(),
+    vendor: {
+      name: vendorDetails?.name,
+    },
+  };
 
   if (!result) {
     throw new AppError(
@@ -119,12 +130,109 @@ const getSingleProductFromDB = async (id: string) => {
       'Failed to get the product with this id',
     );
   } else {
-    return result;
+    return resultToBeReturned;
   }
+};
+
+// get all products for vendor dashboard from DB
+const getAllProductsForVendorFromDB = async (
+  query: any,
+  decodedUser: TDecodedUser,
+) => {
+  const { role, email } = decodedUser;
+  const { page, limit, search } = query;
+
+  if (role !== 'vendor') {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to access this route',
+    );
+  }
+
+  const totalDocs = await ProductModel.countDocuments({
+    vendor: email,
+  });
+
+  const meta = {
+    page: Number(page) || 1,
+    limit: Number(limit) || 10,
+    total: totalDocs,
+  };
+
+  //implement pagination
+  const pageToBeFetched = Number(page);
+  const limitToBeFetched = Number(limit);
+  const skip = (pageToBeFetched - 1) * limitToBeFetched;
+
+  // search by name or email
+  const filter: Record<string, any> = {};
+  filter.vendor = email;
+
+  if (search) {
+    filter.$or = [{ title: new RegExp(String(search), 'i') }];
+  }
+
+  const result = await ProductModel.find(filter)
+    .skip(skip)
+    .limit(limitToBeFetched);
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to get products');
+  }
+
+  return {
+    meta,
+    data: result,
+  };
+};
+
+// delete a single product from DB
+const deleteProductFromDB = async (id: string, decodedUser: TDecodedUser) => {
+  const { role, email } = decodedUser;
+
+  if (email === 'demovendor@gmail.com') {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Developer Babul has set restrictions to delete products from this demo vendor account to keep data consistency.',
+    );
+  }
+
+  if (role !== 'vendor') {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to access this. Please login as a vendor',
+    );
+  }
+
+  const product = await ProductModel.findById(id);
+
+  if (!product) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Failed to get the product with this id',
+    );
+  }
+
+  if (product.vendor !== email) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to delete this product',
+    );
+  }
+
+  const result = await ProductModel.findByIdAndDelete(id);
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete product');
+  }
+
+  return result;
 };
 
 export const ProductServices = {
   createProductInDB,
   getAllProductsFromDB,
   getSingleProductFromDB,
+  getAllProductsForVendorFromDB,
+  deleteProductFromDB,
 };
