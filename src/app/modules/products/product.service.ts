@@ -173,6 +173,7 @@ const getAllProductsForVendorFromDB = async (
   }
 
   const result = await ProductModel.find(filter)
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limitToBeFetched);
 

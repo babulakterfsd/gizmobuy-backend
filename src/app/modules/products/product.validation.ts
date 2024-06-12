@@ -57,7 +57,7 @@ export const productValidationSchema = z.object({
       invalid_type_error: ' must be string',
       required_error: ' is required',
     })
-    .min(200, ' must be at least 200 characters')
+    .min(400, ' must be at least 400 characters')
     .max(800, ' must be at most 800 characters'),
 
   vendor: z.string({
