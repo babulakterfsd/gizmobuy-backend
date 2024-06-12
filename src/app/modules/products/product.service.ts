@@ -193,7 +193,7 @@ const deleteProductFromDB = async (id: string, decodedUser: TDecodedUser) => {
   if (email === 'demovendor@gmail.com') {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'Developer Babul has set restrictions to delete products from this demo vendor account to keep data consistency.',
+      'Admin has set restrictions to delete products from this demo vendor account to keep data consistency.',
     );
   }
 
