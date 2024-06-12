@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { TDecodedUser } from '../authentication/auth.interface';
@@ -39,7 +40,6 @@ const getAllProductsFromDB = async (query: any) => {
     minPrice,
     maxPrice,
     brand,
-    vendor,
     category,
   } = query;
 
