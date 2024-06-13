@@ -2,7 +2,10 @@ import express from 'express';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { ProductControllers } from './product.controller';
-import { productValidationSchema } from './product.validation';
+import {
+  productUpdateValidationSchema,
+  productValidationSchema,
+} from './product.validation';
 
 const router = express.Router();
 
@@ -19,6 +22,14 @@ router.post(
   auth('vendor'),
   validateRequest(productValidationSchema),
   ProductControllers.createProduct,
+);
+
+// update a single product
+router.put(
+  '/:id',
+  auth('vendor'),
+  validateRequest(productUpdateValidationSchema),
+  ProductControllers.updateProduct,
 );
 
 // delete a single product

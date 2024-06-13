@@ -230,10 +230,88 @@ const deleteProductFromDB = async (id: string, decodedUser: TDecodedUser) => {
   return result;
 };
 
+// update a single product in DB
+const updateProductInDB = async (
+  decodedUser: TDecodedUser,
+  id: string,
+  product: TProduct,
+) => {
+  const { role, email } = decodedUser;
+
+  if (role !== 'vendor') {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to access this. Please login as a vendor',
+    );
+  }
+
+  const vendor = await UserModel.findOne({ email });
+
+  if (!vendor) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Failed to get vendor details and update product',
+    );
+  }
+
+  const productToUpdate = await ProductModel.findById(id);
+
+  if (!productToUpdate) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Failed to get the product with this id',
+    );
+  }
+
+  if (productToUpdate.vendor !== email) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to update this product',
+    );
+  }
+
+  if (product?.stock < 1) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Stock should be equal or greater than 1',
+    );
+  } else if (product?.price < 1) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Price should be equal or greater than 1',
+    );
+  }
+  const { title, price, stock, brand, category, displayImage, description } =
+    product;
+
+  const result = await ProductModel.findByIdAndUpdate(
+    id,
+    {
+      title: title ? title : productToUpdate.title,
+      price: price ? Number(price) : productToUpdate.price,
+      stock: stock ? Number(stock) : productToUpdate.stock,
+      brand: brand ? brand : productToUpdate.brand,
+      category: category ? category : productToUpdate.category,
+      displayImage: displayImage ? displayImage : productToUpdate.displayImage,
+      description: description ? description : productToUpdate.description,
+    },
+    {
+      new: true,
+    },
+  );
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update product');
+  }
+
+  return result;
+};
+
 export const ProductServices = {
   createProductInDB,
   getAllProductsFromDB,
   getSingleProductFromDB,
   getAllProductsForVendorFromDB,
   deleteProductFromDB,
+  updateProductInDB,
 };

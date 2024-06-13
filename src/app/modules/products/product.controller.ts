@@ -90,10 +90,35 @@ const deleteProduct = catchAsync(async (req, res) => {
   });
 });
 
+// update a single product
+const updateProduct = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const result = await ProductServices.updateProductInDB(
+    decodedUser as TDecodedUser,
+    req.params?.id,
+    req.body,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Product has been updated successfully',
+    data: result,
+  });
+});
+
 export const ProductControllers = {
   createProduct,
   getAllProducts,
   getSingleProduct,
   getAllProductsOfAVendorToManage,
   deleteProduct,
+  updateProduct,
 };
