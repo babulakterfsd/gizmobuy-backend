@@ -2,7 +2,10 @@ import express from 'express';
 import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { OrderControllers } from './order.controller';
-import { orderValidationSchema } from './order.validation';
+import {
+  orderUpdateValidationSchema,
+  orderValidationSchema,
+} from './order.validation';
 
 const router = express.Router();
 
@@ -22,5 +25,13 @@ router.get('/sells-history', auth('admin'), OrderControllers.getAllOrdersData);
 
 // get my orders
 router.get('/my-orders', auth('customer'), OrderControllers.getMyOrdersData);
+
+// update order status
+router.put(
+  '/update-order-status/:id',
+  auth('admin'),
+  validateRequest(orderUpdateValidationSchema),
+  OrderControllers.updateOrderStatus,
+);
 
 export const OrderRoutes = router;

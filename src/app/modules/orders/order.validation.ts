@@ -110,3 +110,10 @@ export const orderValidationSchema = z.object({
     required_error: ' is required',
   }),
 });
+
+export const orderUpdateValidationSchema = z.object({
+  orderStatus: z.enum(['processing', 'delivered', 'cancelled'], {
+    invalid_type_error: ' must be one of processing, delivered or cancelled',
+    required_error: ' is required',
+  }),
+});

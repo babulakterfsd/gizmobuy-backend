@@ -73,6 +73,30 @@ const getMyOrdersData = catchAsync(async (req, res) => {
   });
 });
 
+// update order status
+const updateOrderStatus = catchAsync(async (req, res) => {
+  const token = req?.headers?.authorization;
+  const splittedToken = token?.split(' ')[1] as string;
+
+  const decodedUser = jwt.verify(
+    splittedToken,
+    config.jwt_access_secret as string,
+  );
+
+  const result = await OrderServices.updateOrderStatus(
+    decodedUser as TDecodedUser,
+    req?.params?.id,
+    req?.body?.orderStatus,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Order status updated successfully',
+    data: result,
+  });
+});
+
 export const OrderControllers = {
   initPayment,
   createOrder,
@@ -80,4 +104,5 @@ export const OrderControllers = {
   deleteOrderForCancelledPayment,
   getAllOrdersData,
   getMyOrdersData,
+  updateOrderStatus,
 };

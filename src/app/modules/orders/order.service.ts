@@ -5,6 +5,7 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 import { getFormattedDate, getTodaysDate } from '../../utils/dateFormater';
 import { TDecodedUser } from '../authentication/auth.interface';
+import { UserModel } from '../authentication/auth.model';
 import { ProductModel } from '../products/product.model';
 import { TOrder } from './order.interface';
 import { OrderModel } from './order.model';
@@ -53,9 +54,9 @@ const initiatePayment = async (order: TOrder) => {
       0,
       10,
     )}${Date.now().toString().slice(7, 11)}`,
-    success_url: `http://localhost:5000/api/orders/success?orderId=${order?.orderId}`,
-    fail_url: `http://localhost:5000/api/orders/fail?orderId=${order?.orderId}`,
-    cancel_url: `http://localhost:5000/api/orders/cancel?orderId=${order?.orderId}`,
+    success_url: `https://gizmobuy.vercel.app/api/orders/success?orderId=${order?.orderId}`,
+    fail_url: `https://gizmobuy.vercel.app/api/orders/fail?orderId=${order?.orderId}`,
+    cancel_url: `https://gizmobuy.vercel.app/api/orders/cancel?orderId=${order?.orderId}`,
     ipn_url: '',
     shipping_method: 'Courier',
     product_name: 'Gizmobuy',
@@ -113,7 +114,7 @@ const createOrderInDB = async (req: any) => {
     { new: true },
   );
 
-  return { redirectUrl: 'http://localhost:5173/order-success' };
+  return { redirectUrl: 'https://gizmobuy.vercel.app/order-success' };
 };
 
 // delete order from DB for failed payment
@@ -124,7 +125,7 @@ const deleteOrderForFailedPayment = async (req: any) => {
   // delete order
   await OrderModel.findOneAndDelete({ orderId });
 
-  return { redirectUrl: 'http://localhost:5173/order-fail' };
+  return { redirectUrl: 'https://gizmobuy.vercel.app/order-fail' };
 };
 
 // delete order from DB for cancelled payment
@@ -135,7 +136,7 @@ const deleteOrderForCancelledPayment = async (req: any) => {
   // delete order
   await OrderModel.findOneAndDelete({ orderId });
 
-  return { redirectUrl: 'http://localhost:5173/order-cancel' };
+  return { redirectUrl: 'https://gizmobuy.vercel.app/order-cancel' };
 };
 
 // get sells history for admin
@@ -206,9 +207,12 @@ const getAllOrdersDataFromDB = async (req: any, query: any) => {
 
   const reultToBereturned = {
     completedSells: orderHistory.filter((order: any) => order.isPaid)?.length,
-    totalSells: orderHistory
-      .filter((order: any) => order.isPaid)
-      .reduce((acc: any, order: any) => acc + order.totalBill, 0),
+    totalSells: Number(
+      orderHistory
+        .filter((order: any) => order.isPaid)
+        .reduce((acc: any, order: any) => acc + order.totalBill, 0)
+        .toFixed(2),
+    ),
     gizmobuyProfit: +gizmoBuyProfit,
     orders: orderHistory,
   };
@@ -233,6 +237,38 @@ const getMyOrdersDataFromDB = async (decodedUser: TDecodedUser) => {
   return myOrders;
 };
 
+// update order status by admin
+const updateOrderStatus = async (
+  decodedUser: TDecodedUser,
+  id: string,
+  status: string,
+) => {
+  const { role, email } = decodedUser;
+
+  if (role !== 'admin') {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
+  }
+  const admin = await UserModel.findOne({ email });
+
+  if (!admin) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
+  }
+
+  const orderToBeUpdated = await OrderModel.findOneAndUpdate(
+    { _id: id },
+    {
+      orderStatus: status,
+    },
+    { new: true },
+  );
+
+  if (!orderToBeUpdated) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+  }
+
+  return orderToBeUpdated;
+};
+
 export const OrderServices = {
   initiatePayment,
   createOrderInDB,
@@ -240,4 +276,5 @@ export const OrderServices = {
   deleteOrderForCancelledPayment,
   getAllOrdersDataFromDB,
   getMyOrdersDataFromDB,
+  updateOrderStatus,
 };
