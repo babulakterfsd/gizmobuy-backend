@@ -62,6 +62,7 @@ const getMyOrdersData = catchAsync(async (req, res) => {
   );
 
   const result = await OrderServices.getMyOrdersDataFromDB(
+    req?.query,
     decodedUser as TDecodedUser,
   );
 

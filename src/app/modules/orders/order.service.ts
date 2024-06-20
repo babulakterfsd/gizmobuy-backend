@@ -149,6 +149,14 @@ const getAllOrdersDataFromDB = async (req: any, query: any) => {
   const limitToBeFetched = Number(limit) || 10;
   const skip = (pageToBeFetched - 1) * limitToBeFetched;
 
+  const totalDocs = await OrderModel.countDocuments();
+
+  const meta = {
+    page: pageToBeFetched,
+    limit: limitToBeFetched,
+    total: totalDocs,
+  };
+
   // Calculate the start date based on the specified timeframe
   let weekAgo;
   let monthAgo;
@@ -217,11 +225,14 @@ const getAllOrdersDataFromDB = async (req: any, query: any) => {
     orders: orderHistory,
   };
 
-  return reultToBereturned;
+  return {
+    meta,
+    data: reultToBereturned,
+  };
 };
 
 // get my orders for customer
-const getMyOrdersDataFromDB = async (decodedUser: TDecodedUser) => {
+const getMyOrdersDataFromDB = async (query: any, decodedUser: TDecodedUser) => {
   const { email } = decodedUser;
 
   // delete my unpaid orders
@@ -230,11 +241,34 @@ const getMyOrdersDataFromDB = async (decodedUser: TDecodedUser) => {
     isPaid: false,
   });
 
-  const myOrders = await OrderModel.find({ orderBy: email }).sort({
-    createdAt: -1,
+  const { page, limit } = query;
+
+  //implement pagination
+  const pageToBeFetched = Number(page) || 1;
+  const limitToBeFetched = Number(limit) || 10;
+  const skip = (pageToBeFetched - 1) * limitToBeFetched;
+
+  const totalDocs = await OrderModel.countDocuments({
+    orderBy: email,
   });
 
-  return myOrders;
+  const meta = {
+    page: pageToBeFetched,
+    limit: limitToBeFetched,
+    total: totalDocs,
+  };
+
+  const myOrders = await OrderModel.find({ orderBy: email })
+    .sort({
+      createdAt: -1,
+    })
+    .skip(skip)
+    .limit(limitToBeFetched);
+
+  return {
+    meta,
+    data: myOrders,
+  };
 };
 
 // update order status by admin
