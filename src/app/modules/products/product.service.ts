@@ -191,10 +191,22 @@ const getAllProductsForVendorFromDB = async (
 const deleteProductFromDB = async (id: string, decodedUser: TDecodedUser) => {
   const { role, email } = decodedUser;
 
-  if (email === 'demovendor@gmail.com') {
+  const product = await ProductModel.findById(id);
+
+  if (!product) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'Admin has set restrictions to delete products from this demo vendor account to keep data consistency.',
+      'Failed to get the product with this id',
+    );
+  }
+
+  if (
+    email === 'demovendor@gmail.com' &&
+    product?.releaseDate === '2023-01-01'
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Admin has set restrictions to delete this product to maintain integrity of the system. Please create your own product to test this feature.',
     );
   }
 
@@ -202,15 +214,6 @@ const deleteProductFromDB = async (id: string, decodedUser: TDecodedUser) => {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
       'You are not authorized to access this. Please login as a vendor',
-    );
-  }
-
-  const product = await ProductModel.findById(id);
-
-  if (!product) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'Failed to get the product with this id',
     );
   }
 
@@ -238,13 +241,6 @@ const updateProductInDB = async (
 ) => {
   const { role, email } = decodedUser;
 
-  if (role !== 'vendor') {
-    throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      'You are not authorized to access this. Please login as a vendor',
-    );
-  }
-
   const vendor = await UserModel.findOne({ email });
 
   if (!vendor) {
@@ -254,12 +250,29 @@ const updateProductInDB = async (
     );
   }
 
+  if (role !== 'vendor') {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'You are not authorized to access this. Please login as a vendor',
+    );
+  }
+
   const productToUpdate = await ProductModel.findById(id);
 
   if (!productToUpdate) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       'Failed to get the product with this id',
+    );
+  }
+
+  if (
+    email === 'demovendor@gmail.com' &&
+    productToUpdate?.releaseDate === '2023-01-01'
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Admin has set restrictions to update this product to maintain integrity of the system. Please create your own product to test this feature.',
     );
   }
 
