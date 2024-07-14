@@ -2,29 +2,11 @@
 
 ## Features
 
-##### Customer :
-
-- can view , buy products
-- can view order history and details
-- can view and update profile, including address and password
-- can view and update cart
-- can view and update wishlist
-
-##### Vendor :
-
-- can view and update profile, including address and password
-- can add, view, update and delete products
-- can view and update orders
-- can view sells history and details
-- can view and reply to customer reviews
-
-##### Admin :
-
-- can view and update profile, including address and password
-- can block and unblock any customers and vendors
-- can see all the orders and details and earnings
-- can see and update all the products and details
-- can create cupons and discounts and manage them
+- JWT based secure authorization system with password hashing.
+- Smooth and better user experience ensured with redux persistence.
+- Sslcommerz integrated as payment gateway
+- Add to cart, add to favorite and some common ecommerce features.
+- Authorization based custom dashboard for better management system.
 
 ## technologies:
 
