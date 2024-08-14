@@ -24,4 +24,5 @@ export default {
   store_id: process.env.STORE_ID,
   store_passwd: process.env.STORE_PASSWD,
   ssl_validation_api: process.env.SSL_VALIDATION_API,
+  sendgrid_api_key: process.env.SENDGRID_API_KEY,
 };

@@ -9,6 +9,7 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 
 import { Request } from 'express';
+import resetUI from '../../utils/resetUI';
 import { sendEmail } from '../../utils/sendEmail';
 import { OrderModel } from '../orders/order.model';
 import { ProductModel } from '../products/product.model';
@@ -354,14 +355,11 @@ const forgetPasswordInDB = async (userEmail: string) => {
     expiresIn: '5m',
   });
 
-  const resetUrl = `${config.client_url}/forgot-password?email=${userEmail}&token=${resettoken}`;
+  const resetUrl = `${'https://gizmobuy.vercel.app'}/forgot-password?email=${userEmail}&token=${resettoken}`;
 
-  sendEmail(
-    userFromDB?.email,
-    `<p>Click <a href="${resetUrl}" target="_blank">here</a> to reset your password</p> . <br/> <p>If you didn't request a password reset, please ignore this email.After 5 mins, the link will be invalid</p>`,
-  );
+  const msg = sendEmail(userFromDB?.email, resetUI(resetUrl));
 
-  return null;
+  return msg;
 };
 
 // reset forgotten password
