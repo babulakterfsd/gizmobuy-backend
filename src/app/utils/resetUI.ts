@@ -12,7 +12,7 @@ const resetUI = (resetUILink: string): string => {
       <p>We received a request to reset the password for your account. If you did not make this request, please ignore this email.</p>
       <p>To reset your password, please click on the button below:</p>
       <p style="text-align: center;">
-          <a href="${resetUILink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px;">Reset Password</a>
+          <a href="${resetUILink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 6px;">Reset Password</a>
       </p>
       <p>If the button above doesn't work, you can also copy and paste the following link into your browser:</p>
       <p><a href="${resetUILink}">${resetUILink}</a></p>
